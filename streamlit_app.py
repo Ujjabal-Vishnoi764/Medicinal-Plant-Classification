@@ -14,11 +14,34 @@ st.set_page_config(
 
 
 # Load trained model
-model = joblib.load("model/plant_classifier.pkl")
-encoder = joblib.load("model/label_encoder.pkl")
+from huggingface_hub import hf_hub_download
+import joblib
+from pathlib import Path
 
-IMG_SIZE = (128, 128)
+REPO_ID = "ujjabal29/medicinal-plant-classifier"
 
+local_model = Path("model/plant_classifier.pkl")
+local_encoder = Path("model/label_encoder.pkl")
+
+if local_model.exists() and local_encoder.exists():
+    model = joblib.load(local_model)
+    encoder = joblib.load(local_encoder)
+
+else:
+    model_path = hf_hub_download(
+        repo_id=REPO_ID,
+        filename="plant_classifier.pkl"
+    )
+
+    encoder_path = hf_hub_download(
+        repo_id=REPO_ID,
+        filename="label_encoder.pkl"
+    )
+
+    model = joblib.load(model_path)
+    encoder = joblib.load(encoder_path)
+
+IMG_SIZE = (128, 128)    
 
 # Session History
 if "history" not in st.session_state:
