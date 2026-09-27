@@ -1,4 +1,3 @@
-
 import streamlit as st
 import numpy as np
 import joblib
@@ -61,17 +60,42 @@ plant_info = {
 }
 
 
+# ---------------- MAIN PAGE ----------------
+
 st.title("🌿 Medicinal Plant Classification")
 
 st.write(
     "Upload a plant image to identify the medicinal plant using Machine Learning."
 )
 
-
 st.info(
     "Model: HOG + SVM | Classes: 5 | Image Size: 128 × 128"
 )
 
+
+# ---------------- ABOUT PROJECT ----------------
+
+st.subheader("ℹ️ About Project")
+
+st.write(
+    "This project uses Artificial Intelligence and "
+    "Machine Learning to identify medicinal plants "
+    "from uploaded images."
+)
+
+st.write(
+    "The system uses HOG feature extraction and "
+    "an SVM classifier to classify five medicinal plants."
+)
+
+st.caption(
+    "Model accuracy on the test split: 75.86%. "
+    "The confidence shown is a model score converted "
+    "to a percentage-like value and is not a calibrated probability."
+)
+
+
+# ---------------- IMAGE UPLOAD ----------------
 
 uploaded_file = st.file_uploader(
     "Choose a plant image",
@@ -107,10 +131,14 @@ if uploaded_file is not None:
             cells_per_block=(2, 2)
         )
 
+
+        # Prediction
         prediction_number = model.predict(
             [features]
         )[0]
 
+
+        # Decision score
         decision_scores = model.decision_function(
             [features]
         )
@@ -120,32 +148,58 @@ if uploaded_file is not None:
         else:
             score = np.max(decision_scores)
 
+
+        # Confidence
         confidence = min(
             max((score + 1) * 50, 0),
             100
         )
 
+
+        # Convert prediction number to plant name
         prediction = encoder.inverse_transform(
             [prediction_number]
         )[0]
 
-        plant_name = prediction.replace(
-            " bg aug",
-            ""
-        )
+        plant_name = prediction.strip()
 
+        plant_name = plant_name.replace(" bg aug", "")
+        plant_name = plant_name.replace("bg aug", "")
+        plant_name = plant_name.strip()
 
-        # Add prediction to session history
+        # Fix plant name matching
+        if plant_name.lower() == "aloe vera":
+            plant_name = "Aloe Vera"
+
+        elif plant_name.lower() == "neem":
+            plant_name = "Neem"
+
+        elif plant_name.lower() == "tulsi":
+            plant_name = "Tulsi"
+
+        elif plant_name.lower() == "hibiscus":
+            plant_name = "Hibiscus"
+
+        elif plant_name.lower() == "moringa":
+            plant_name = "Moringa"
+
+       
+
+        # Prediction History
         st.session_state.history.append({
             "Plant": plant_name,
             "Confidence": f"{confidence:.2f}%",
-            "Time": datetime.now().strftime("%d-%m-%Y %I:%M:%S %p")
+            "Time": datetime.now().strftime(
+                "%d-%m-%Y %I:%M:%S %p"
+            )
         })
 
 
+        # Prediction Result
         st.success(
             f"🌿 Predicted Plant: {plant_name}"
         )
+
 
         st.metric(
             "Model Confidence",
@@ -153,6 +207,7 @@ if uploaded_file is not None:
         )
 
 
+        # Plant Information
         info = plant_info.get(
             plant_name,
             {}
@@ -170,26 +225,12 @@ if uploaded_file is not None:
             st.subheader("⚠️ Precautions")
             st.write(info["precautions"])
 
+        else:
 
-        # About Project
-        st.subheader("ℹ️ About Project")
+            st.info(
+                "Plant information is not available."
+            )
 
-        st.write(
-            "This project uses Artificial Intelligence and "
-            "Machine Learning to identify medicinal plants "
-            "from uploaded images."
-        )
-
-        st.write(
-            "The system uses HOG feature extraction and "
-            "an SVM classifier to classify five medicinal plants."
-        )
-
-        st.caption(
-            "Model accuracy on the test split: 75.86%. "
-            "The confidence shown is a model score converted "
-            "to a percentage-like value and is not a calibrated probability."
-        )
 
         st.warning(
             "This information is for educational purposes only "
@@ -217,16 +258,19 @@ if len(st.session_state.history) > 0:
         use_container_width=True
     )
 
+
     if st.button("🗑️ Clear History"):
 
         st.session_state.history = []
 
-        st.success("Prediction history cleared.")
+        st.success(
+            "Prediction history cleared."
+        )
 
         st.rerun()
 
 else:
 
-    st.info("No prediction history yet.")
-    
-    
+    st.info(
+        "No prediction history yet."
+    )
