@@ -15,7 +15,7 @@ app = Flask(__name__)
 db = mysql.connector.connect(
     host="127.0.0.1",
     user="root",
-    password="ujjwal@29",
+    password="your_password",
     database="medicinal_plant_db"
 )
 model = joblib.load("model/plant_classifier.pkl")
