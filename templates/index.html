@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+    <title>Medicinal Plant Classification</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='style.css') }}">
+
+</head>
+
+<body>
+
+    <div class="container">
+
+        <h1>🌿 Medicinal Plant Classification</h1>
+
+        <div class="dashboard">
+
+            <h2>📊 Prediction Dashboard</h2>
+
+            <p>
+                <strong>Total Predictions:</strong>
+                {{ total_predictions }}
+            </p>
+
+            <p>
+                <strong>Most Predicted Plant:</strong>
+                {{ most_predicted }}
+            </p>
+
+            <p>
+                <strong>Average Confidence:</strong>
+                {{ "%.2f"|format(average_confidence) }}%
+            </p>
+
+        </div>
+        
+
+        <p>
+            Upload a plant image to identify the medicinal plant.
+        </p>
+<div class="result">
+
+    <h2>ℹ️ About Project</h2>
+
+    <p>
+        This project uses Artificial Intelligence and Machine Learning
+        to identify medicinal plants from uploaded images.
+    </p>
+
+    <p>
+        The system uses HOG feature extraction and an SVM classifier
+        to classify five medicinal plants.
+    </p>
+
+    <p>
+        <strong>Model:</strong> HOG + SVM
+    </p>
+
+    <p>
+        <strong>Image Size:</strong> 128 × 128 pixels
+    </p>
+
+    <p>
+        <strong>Classes:</strong> 5
+    </p>
+
+    <p>
+        <strong>Model Accuracy:</strong> 75.86%
+    </p>
+
+</div>
+
+
+        <form method="POST" enctype="multipart/form-data">
+
+            <input type="file"
+                   name="image"
+                   accept="image/*"
+                   required>
+
+            <br><br>
+
+            <button type="submit">
+                🔍 Predict Plant
+            </button>
+
+        </form>
+
+        {% if uploaded_image %}
+
+            <div class="image-preview">
+
+                <h3>Uploaded Image</h3>
+
+                <img src="/uploads/uploaded_image.jpg"
+                     alt="Uploaded Plant Image"
+                     width="250">
+
+            </div>
+
+        {% endif %}
+
+        {% if prediction %}
+
+            <div class="result">
+
+                <h2>🌿 {{ info.name }}</h2>
+
+                <p>
+                    <strong>🎯 Model Confidence:</strong>
+                    {{ "%.2f"|format(confidence) }}%
+                </p>
+
+                <p>
+                    <strong>💊 Uses:</strong>
+                    {{ info.uses }}
+                </p>
+
+                <p>
+                    <strong>🌱 Benefits:</strong>
+                    {{ info.benefits }}
+                </p>
+
+                <p>
+                    <strong>⚠️ Precautions:</strong>
+                    {{ info.precautions }}
+                </p>
+
+                <p>
+                    <strong>ℹ️ Disclaimer:</strong>
+                    This information is for educational purposes only
+                    and is not a substitute for professional medical advice.
+                </p>
+
+            </div>
+
+        {% endif %}
+
+        {% if history %}
+
+            <div class="result">
+
+                <h2>📊 Prediction History</h2>
+
+                <table>
+
+                    <tr>
+                        <th>Plant</th>
+                        <th>Confidence</th>
+                        <th>Date & Time</th>
+                    </tr>
+
+                    {% for item in history %}
+
+                    <tr>
+
+                        <td>
+                            {{ item.plant_name }}
+                        </td>
+
+                        <td>
+                            {{ "%.2f"|format(item.confidence) }}%
+                        </td>
+
+                        <td>
+                            {{ item.prediction_time }}
+                        </td>
+
+                    </tr>
+
+                    {% endfor %}
+
+                </table>
+
+                <br>
+
+                <form method="POST"
+                      action="/clear-history">
+
+                    <button type="submit"
+                            onclick="return confirm('Are you sure you want to clear prediction history?');">
+
+                        🗑️ Clear History
+
+                    </button>
+
+                </form>
+
+            </div>
+
+        {% endif %}
+
+    </div>
+
+</body>
+
+</html>
+
